@@ -1,0 +1,43 @@
+{
+  "name": "portfolio",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Evan Bhandari",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "typecheck": "tsc -b",
+    "preview": "vite preview",
+    "audit:shots": "node tools/ui-audit/shots.mjs",
+    "audit:perf": "node tools/ui-audit/perf.mjs",
+    "audit:plan": "node tools/ui-audit/plan.mjs",
+    "audit:summit": "node tools/ui-audit/summit.mjs",
+    "audit:contrast": "node tools/ui-audit/contrast.mjs",
+    "audit:ab": "node tools/ui-audit/ab.mjs",
+    "audit:cost": "node tools/ui-audit/cost.mjs",
+    "audit:load": "node tools/ui-audit/load.mjs",
+    "audit:keyboard": "node tools/ui-audit/keyboard.mjs",
+    "audit:copyzone": "node tools/ui-audit/copyzone.mjs"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.7.0",
+    "lenis": "^1.3.26",
+    "react": "~19.2.8",
+    "react-dom": "~19.2.8",
+    "three": "~0.182.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@types/three": "~0.182.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}

@@ -1,0 +1,683 @@
+/* ---- Summit rail and glass panels (SummitNav.tsx) ----
+
+   The rail is evanbhandari.com.np's section rail mirrored to the left edge: tiny widely
+   tracked capitals in the one monospace, each with a dot, dim until chosen, the active dot
+   amber. It opens one glass panel per section beside it.
+
+   All of it is clear glass, matched to Evan's references (a login card over a lemon, a
+   weather widget over foliage): no blur, so the scene sits sharp behind it, darkened by a
+   fifth (Evan chose 20% with a test slider, 2026-10-02); the rest of the glass is its rim,
+   where the scene bends round the curved edge (liquidGlass.ts), and a 1px bright hairline,
+   brightest at the top left; no drop shadow.
+   Every value lives in the tokens below and every surface is one class, `.glass`.
+   Elements set on the glass (the close button, chips, badges) are `.glass-inset`: the same
+   edge and a faint fill, but no blur of their own, so the page never stacks blurred layers.
+
+   The type is white, as in the references, with a soft dark halo (--glass-text-shadow) that
+   darkens only the few pixels round each glyph. On fully clear glass white vanished against
+   the sun; the 20% tint is what lets it read. Evan picked the pair together, by eye.
+
+   The glass comes in three strengths:
+
+     liquid   Chromium. liquidGlass.ts adds the one thing CSS cannot do: the scene bends
+              inward across a curved rim. Tint, edge and type are the same as below.
+     css      Firefox and Safari: the same glass without the bending.
+     opaque   ?glass=opaque: near-opaque smoke, for anyone who wants the text on a solid.
+
+   prefers-reduced-transparency changes nothing here. Windows reports it whenever its
+   "Transparency effects" switch is off (it is, on Evan's machine), and this glass has no
+   blur to reduce: it is a light tint, a hairline and a bend.
+
+   From 900px wide the rail and panel sit side by side on the left; below that the rail is a
+   pill bar along the bottom and the panel a sheet above it. */
+
+.summit-nav {
+  /* Surface: clear and unblurred, darkened by a fifth; the rim's bend is what makes it glass. */
+  --glass-tint: rgb(0 0 0 / 0.2);
+  --glass-radius-lg: 40px;
+  --glass-radius-md: 26px;
+  --glass-radius-pill: 999px;
+
+  /* Edge: a 1px bright hairline all the way round, brightest at the top left */
+  --glass-border-start: rgb(255 255 255 / 0.7);
+  --glass-border-mid: rgb(255 255 255 / 0.3);
+  --glass-border-end: rgb(255 255 255 / 0.45);
+  --glass-highlight: rgb(255 255 255 / 0.22);
+  --glass-shade: rgb(255 255 255 / 0.08);
+  --glass-shadow: 0 0 #0000; /* none: the references are flat */
+
+  /* Things set on the glass, like the login card's fields: a pale fill and the same edge */
+  --glass-fill: rgb(255 255 255 / 0.14);
+  --glass-fill-hover: rgb(255 255 255 / 0.22);
+  --glass-rule: rgb(255 255 255 / 0.2);
+
+  /* Type */
+  --glass-text: rgb(255 255 255 / 0.95);
+  --glass-text-muted: rgb(255 255 255 / 0.88);
+  --glass-text-shadow:
+    0 0 2px rgb(0 0 0 / 0.5),
+    0 1px 4px rgb(0 0 0 / 0.35);
+  /* The rail's small capitals: a tighter halo, for 10.5px type */
+  --glass-label-shadow:
+    0 0 2px rgb(0 0 0 / 0.55),
+    0 0 6px rgb(0 0 0 / 0.4);
+  --glass-accent: #f4cf5d; /* gold: the active dot and the headline placing, nothing else */
+  --glass-accent-edge: #9c6a0c;
+  --glass-focus: rgb(255 255 255 / 0.92);
+  --glass-scroll: rgb(255 255 255 / 0.3);
+
+  --spring: cubic-bezier(0.3, 1.55, 0.6, 1);
+  --settle: cubic-bezier(0.4, 0, 0.2, 1);
+
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.summit-nav :focus-visible {
+  outline: 2px solid var(--glass-focus);
+  outline-offset: 2px;
+}
+
+/* ---- The glass ---- */
+
+/* The border is transparent and the tint paints under it; ::before draws the visible edge
+   over that 1px. The inset shadows sit just inside it: highlight along the top, shade along
+   the bottom, which is what reads as thickness. */
+.glass {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: var(--glass-radius-lg);
+  background-color: var(--glass-tint);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 var(--glass-shade),
+    var(--glass-shadow);
+  color: var(--glass-text);
+  text-shadow: var(--glass-text-shadow);
+}
+
+.glass-inset {
+  position: relative;
+  border: 1px solid transparent;
+  background-color: var(--glass-fill);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+/* The hairline: a gradient ring cut out of a full box with mask-composite, so it follows the
+   corner radius exactly and stays 1px wide wherever the gradient runs. */
+.glass::before,
+.glass-inset::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom right,
+    var(--glass-border-start),
+    var(--glass-border-mid) 45%,
+    var(--glass-border-end)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* ---- Rail ---- */
+
+/* The nav is the glass and the list inside it scrolls (on a phone). The fade sits on the
+   glass element itself: an ancestor below full opacity would become its backdrop root, and
+   the blur would see nothing until the fade finished. */
+.summit-rail {
+  --reveal: 0;
+  flex: none;
+  border-radius: var(--glass-radius-md);
+  visibility: hidden; /* the ticker takes over once the camera nears the summit */
+  pointer-events: auto;
+  opacity: var(--reveal);
+  transform: translate3d(calc((1 - var(--reveal)) * -10px), 0, 0);
+}
+
+.summit-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px;
+}
+
+.summit-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  padding: 0 12px 0 6px;
+  border-radius: var(--glass-radius-pill);
+  font-family: var(--font-badge);
+  font-size: 0.65625rem; /* 10.5px */
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Full strength and a tighter halo than the panels: these are 10.5px capitals. */
+  color: var(--glass-text);
+  text-shadow: var(--glass-label-shadow);
+  cursor: pointer;
+  transition:
+    color 0.5s var(--settle),
+    background-color 0.3s var(--settle);
+}
+
+.summit-rail-item:hover,
+.summit-rail-item[aria-expanded='true'] {
+  color: var(--glass-text);
+}
+
+.summit-rail-item:hover {
+  background-color: var(--glass-fill-hover);
+}
+
+.summit-rail-item:focus-visible {
+  outline-offset: 0;
+}
+
+/* A fixed box, so the larger active dot grows in place and the labels stay aligned. */
+.summit-rail-dot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 10px;
+  height: 10px;
+}
+
+.summit-rail-dot::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 0 0 transparent;
+  transition:
+    width 0.5s var(--settle),
+    height 0.5s var(--settle),
+    background-color 0.5s var(--settle),
+    box-shadow 0.5s var(--settle);
+}
+
+.summit-rail-item[aria-expanded='true'] .summit-rail-dot::before {
+  width: 8px;
+  height: 8px;
+  background-color: var(--glass-accent);
+  box-shadow:
+    0 0 0 1.5px var(--glass-accent-edge),
+    0 0 10px 2px rgb(244 207 93 / 0.7);
+}
+
+/* Inactive labels sit a step in toward their dot and move out on hover, as on the old site. */
+.summit-rail-label {
+  transform: translateX(-3px);
+  transition: transform 0.5s var(--settle);
+}
+
+.summit-rail-item:hover .summit-rail-label,
+.summit-rail-item[aria-expanded='true'] .summit-rail-label {
+  transform: none;
+}
+
+/* ---- Panels ---- */
+
+/* One grid cell for all seven, so a switch cross-fades two panels in the same place. */
+.summit-panels {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  align-items: center;
+  width: clamp(440px, 40vw, 560px);
+  height: 80svh;
+}
+
+.summit-panel {
+  display: flex;
+  flex-direction: column;
+  grid-area: 1 / 1;
+  min-height: 0;
+  max-height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(-24px, 0, 0) scale(0.93);
+  transform-origin: left center;
+  transition:
+    opacity 0.18s ease-in,
+    transform 0.22s ease-in,
+    visibility 0s linear 0.22s;
+}
+
+.summit-panel[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 0.24s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.32s var(--spring),
+    visibility 0s;
+}
+
+.glass-head {
+  position: relative; /* above the edge */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 30px 72px 10px 38px;
+}
+
+.glass-title {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--glass-text);
+  text-wrap: balance;
+}
+
+.glass-ne {
+  font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Nirmala UI', 'Mangal', sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  color: var(--glass-text-muted);
+}
+
+.glass-close {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--glass-radius-pill);
+  color: var(--glass-text);
+  cursor: pointer;
+  transition: background-color 0.2s var(--settle);
+}
+
+.glass-close:hover {
+  background-color: var(--glass-fill-hover);
+}
+
+/* The edges fade, so a line cut by the scroll reads as more to come rather than as clipped.
+   The fades sit over the body's own padding: at either end of the scroll, nothing is lost. */
+.glass-body {
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 38px 32px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 10px, #000 calc(100% - 28px), transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-scroll) transparent;
+}
+
+.glass-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.glass-body::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background-color: var(--glass-scroll);
+}
+
+/* ---- Panel content ---- */
+
+.glass-entry + .glass-entry {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--glass-rule);
+}
+
+.glass-entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 14px;
+}
+
+.glass-entry-title {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--glass-text);
+}
+
+.glass-meta {
+  font-family: var(--font-badge);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--glass-text-muted);
+}
+
+.glass-meta span + span::before {
+  content: '·';
+  margin: 0 0.5em;
+}
+
+/* The role or degree: what the entry was, read right after its name. White like the name,
+   lighter in weight, so the two read as one unit. */
+.glass-role {
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--glass-text);
+}
+
+.glass-gpa {
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-size: 0.96875rem;
+  font-weight: 600;
+  color: var(--glass-text);
+}
+
+.glass-bullets {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.glass-bullets li {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-body);
+  font-size: 0.96875rem; /* 15.5px */
+  line-height: 1.55;
+  color: var(--glass-text);
+}
+
+.glass-bullets li::before {
+  content: '';
+  position: absolute;
+  top: 0.66em;
+  left: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--glass-text-muted);
+}
+
+/* Placings, the headline one ringed in gold: what a competition entry is read for. */
+.glass-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.glass-badge {
+  padding: 6px 10px 5px;
+  border-radius: var(--glass-radius-pill);
+  font-family: var(--font-badge);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--glass-text);
+}
+
+.glass-badge--lead {
+  --glass-border-start: var(--glass-accent);
+  --glass-border-mid: var(--glass-accent);
+  --glass-border-end: var(--glass-accent);
+  background-color: rgb(244 207 93 / 0.18);
+}
+
+.glass-link {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-size: 0.90625rem;
+  font-weight: 500;
+  color: var(--glass-text);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.4);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s var(--settle);
+}
+
+.glass-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.glass-groups {
+  display: grid;
+  gap: 18px;
+}
+
+.glass-group-label {
+  margin-bottom: 8px;
+  font-family: var(--font-badge);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--glass-text-muted);
+}
+
+.glass-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.glass-chip {
+  padding: 6px 12px;
+  border-radius: var(--glass-radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--glass-text);
+}
+
+.glass-contact li + li {
+  border-top: 1px solid var(--glass-rule);
+}
+
+.glass-contact-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 10px;
+  margin: 0 -10px;
+  border-radius: var(--glass-radius-md);
+  color: var(--glass-text);
+  transition: background-color 0.2s var(--settle);
+}
+
+.glass-contact-row:hover {
+  background-color: var(--glass-fill-hover);
+}
+
+.glass-contact-label {
+  font-family: var(--font-badge);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--glass-text-muted);
+}
+
+.glass-contact-value {
+  overflow-wrap: anywhere;
+  font-family: var(--font-body);
+  font-size: 0.96875rem;
+  font-weight: 550;
+}
+
+.glass-contact-arrow {
+  color: var(--glass-text-muted);
+}
+
+/* ---- Phones and small tablets: a pill bar along the bottom, the panel a sheet above it ---- */
+
+@media (max-width: 899.98px) {
+  /* Capped and centred, so a tablet or a phone on its side keeps a readable line length. */
+  .summit-nav {
+    top: auto;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 12px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  .summit-rail {
+    border-radius: var(--glass-radius-pill);
+    transform: translate3d(0, calc((1 - var(--reveal)) * 14px), 0);
+  }
+
+  .summit-rail-list {
+    position: relative;
+    flex-direction: row;
+    padding: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: inherit;
+  }
+
+  .summit-rail-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .summit-rail-item {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+  }
+
+  .summit-rail-item[aria-expanded='true'] {
+    background-color: var(--glass-fill-hover);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / 0.18);
+  }
+
+  .summit-rail-label,
+  .summit-rail-item:hover .summit-rail-label {
+    transform: none;
+  }
+
+  .summit-panels {
+    width: auto;
+    height: 65svh;
+    align-items: end;
+  }
+
+  .summit-panel {
+    transform: translate3d(0, 30px, 0) scale(0.96);
+    transform-origin: bottom center;
+  }
+
+  .glass-head {
+    padding: 20px 60px 6px 22px;
+  }
+
+  .glass-title {
+    font-size: 1.625rem;
+  }
+
+  .glass-close {
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .glass-body {
+    padding: 10px 22px 28px;
+  }
+
+  .glass-meta {
+    white-space: normal;
+  }
+
+  /* Label over value, so an address gets the full width instead of breaking mid-word. */
+  .glass-contact-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 3px;
+    padding-block: 10px;
+  }
+
+  .glass-contact-value {
+    grid-row: 2;
+  }
+
+  .glass-contact-arrow {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+
+  .glass-link {
+    align-items: center;
+    min-height: 44px;
+    margin-top: 2px;
+  }
+}
+
+/* ---- Fallbacks ---- */
+
+/* Reduced motion: no slide, no spring, no label shift; a quick fade and nothing else. */
+.summit-nav[data-motion='reduced'] .summit-rail {
+  transform: none;
+}
+
+.summit-nav[data-motion='reduced'] .summit-panel {
+  transform: none;
+  transition:
+    opacity 0.1s linear,
+    visibility 0s linear 0.1s;
+}
+
+.summit-nav[data-motion='reduced'] .summit-panel[data-open='true'] {
+  transition:
+    opacity 0.1s linear,
+    visibility 0s;
+}
+
+.summit-nav[data-motion='reduced'] .summit-rail-label {
+  transition: none;
+}
+
+/* ?glass=opaque: near-opaque smoke. */
+.summit-nav[data-glass='opaque'] .glass {
+  background-color: rgb(14 18 28 / 0.96);
+}

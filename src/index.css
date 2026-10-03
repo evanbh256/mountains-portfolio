@@ -1,0 +1,406 @@
+@import 'tailwindcss';
+
+/* Mirrors PALETTE in src/scene/config.ts; main.tsx overwrites these from it at startup. */
+@theme {
+  --color-ink: #0f1b2d;
+
+  /* The four families, one role each (see "Type scale" below). Each stack puts a local face
+     tuned to the webfont's metrics second, so the page sets the same lines before and after
+     the swap. Tailwind's own sans/serif/mono are left at their defaults; nothing uses them. */
+  --font-display:
+    'Bricolage Grotesque', 'Bricolage Grotesque Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-accent: 'Fraunces', 'Fraunces Fallback', Georgia, serif;
+  --font-badge:
+    'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  /* Anything that names no role inherits the body face, not the system sans. */
+  --default-font-family: var(--font-body);
+
+  /* The paragraph's line length (max-w-measure): the width it had when it was set in
+     monospace, so the copy block keeps its footprint. The Nepal layer's props are placed to
+     clear that footprint (COPY_ZONES in scene/nepal/anchors.ts); in rem rather than ch, so the
+     fallback face wraps the same lines as the webfont. */
+  --container-measure: 22.75rem;
+}
+
+/* ---- Fonts ----
+   Self-hosted from Google Fonts, all under the SIL Open Font License 1.1, as the latin and
+   latin-ext subsets Google itself serves (css2 API, the query is noted on each face). A face
+   the page uses at one weight is a static instance, about 22 kB; Inter stays variable because
+   body, labels and links use three weights. latin-ext only downloads if a character needs it.
+   Inter and the H1's Bricolage are preloaded in index.html; the rest load on first use. */
+
+/* Inter:wght@400..600 - the file carries the full 100-900 axis. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+/* Bricolage+Grotesque:opsz,wght@96,800 - the display cut, for the H1 only. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-800-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-800-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+/* Bricolage+Grotesque:opsz,wght@36,700 - an optical size drawn for 28-40px, for every H2. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-700-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+/* Fraunces:ital,opsz,wght@1,24,500 - one short greeting, so latin only. */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/fraunces-italic-500-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* JetBrains+Mono:wght@600 - pill labels only, so latin only. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-600-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Fallbacks, so the swap does not move anything. Each is a local face rescaled to the webfont
+   it stands in for: size-adjust gives the same line length (measured on this page's own copy
+   in Chrome, webfont against local face), and the ascent/descent overrides are the webfont's
+   own metrics over that factor, so the baseline sits where the webfont's will. Liberation Sans
+   and Liberation Mono share Arial's and Courier New's advance widths, so the same numbers
+   hold on Linux. */
+@font-face {
+  font-family: 'Inter Fallback';
+  font-weight: 100 500;
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 106.17%;
+  ascent-override: 91.24%;
+  descent-override: 22.72%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-weight: 600 900;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+  size-adjust: 101.34%;
+  ascent-override: 95.59%;
+  descent-override: 23.8%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque Fallback';
+  font-weight: 800 900;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+  size-adjust: 90.36%;
+  ascent-override: 102.93%;
+  descent-override: 29.88%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque Fallback';
+  font-weight: 100 700;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+  size-adjust: 99.04%;
+  ascent-override: 93.91%;
+  descent-override: 27.26%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Fraunces Fallback';
+  font-style: italic;
+  font-weight: 500;
+  src: local('Georgia Italic'), local('Georgia-Italic');
+  size-adjust: 99.04%;
+  ascent-override: 98.74%;
+  descent-override: 25.75%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  font-weight: 600;
+  src: local('Courier New Bold'), local('CourierNewPS-BoldMT'), local('Liberation Mono Bold');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+/* First beat's sky, shown behind everything before the first WebGL frame and as the
+   no-WebGL poster. main.tsx overwrites these from ATMOSPHERE[0] in src/scene/config.ts;
+   the literals here only cover the moment before that script runs. */
+:root {
+  --sky-top: #7d93b3;
+  --sky-horizon: #b9c6d6;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden; /* the window never scrolls; #scroll-root does */
+    overscroll-behavior: none;
+  }
+
+  body {
+    background-color: var(--sky-horizon);
+    background-image: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-horizon) 62%, #d3dbe4 100%);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    height: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Programmatically focused containers are not controls; no ring on them. */
+  [tabindex='-1']:focus {
+    outline: none;
+  }
+}
+
+/* ---- Layers ---- */
+
+#gl {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#scroll-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  background: transparent;
+}
+
+/* ---- Copy over the scene ----
+   There is no scrim: the copy sits straight on the render, and its colour is chosen for
+   what is behind it. The climb beats run over grass, rock and mist, so they are set light
+   (tone: 'light' in content.ts). The summit rail and panels (summit/summit.css) are
+   ink. `npm run audit:contrast` samples the real pixels under every line.
+
+   The backdrop still shifts under the copy within a beat, so copy carries a soft shadow
+   that follows the letterforms, dark under light copy and light under dark. It touches
+   only the few pixels round each glyph; it is not a box. */
+.copy-light {
+  text-shadow:
+    0 1px 2px rgb(15 27 45 / 0.35),
+    0 0 14px rgb(15 27 45 / 0.4);
+}
+
+/* Dark copy (the Competitions beat, over mist and pale rock) gets the mirror of that: a
+   faint light glow round each glyph, for the moments grey rock passes behind it. */
+.copy-dark {
+  text-shadow:
+    0 0 1px rgb(255 255 255 / 0.9),
+    0 0 4px rgb(255 255 255 / 0.7),
+    0 0 16px rgb(255 255 255 / 0.6);
+}
+
+/* Light on a phone, dark from md up: the Competitions beat (see BeatContent.tone). */
+.copy-split {
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgb(15 27 45 / 0.35),
+    0 0 14px rgb(15 27 45 / 0.4);
+}
+
+@media (min-width: 768px) {
+  .copy-split {
+    color: var(--color-ink);
+    text-shadow:
+      0 0 1px rgb(255 255 255 / 0.9),
+      0 0 4px rgb(255 255 255 / 0.7),
+      0 0 16px rgb(255 255 255 / 0.6);
+  }
+}
+
+/* The Hello copy's entrance on page load (the scroll fades are written by the ticker). */
+.copy-enter {
+  animation: copy-enter 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s both;
+}
+
+@keyframes copy-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-enter {
+    animation-duration: 0.4s;
+    animation-delay: 0s;
+  }
+}
+
+/* ---- Nepal accents (only while .nepal-ui is on the document element) ---- */
+
+:root {
+  /* Warm accents against the cool scene. Crimson on paper is 6.1:1, on white 6.6:1. */
+  --nepal-crimson: #b3202a;
+  /* The same red a step darker, for text that sits on the scrim rather than on solid paper:
+     it clears 4.5:1 on the scrim's plateau over any scene, where the brighter one does not. */
+  --nepal-crimson-deep: #8e1b24;
+}
+
+.nepal-ui :focus-visible {
+  outline-color: var(--nepal-crimson);
+}
+
+/* ---- Type scale ----
+   One ladder for the copy on the climb; the summit rail and panels set the same families at
+   their own sizes in summit/summit.css. Each role carries
+   its own family, so a component names the role and nothing else: no font-* utilities at the
+   call site, and a family change is a one-line edit here.
+
+     display   Bricolage 800   the one H1, the name on the first screen
+     h2        Bricolage 700   every other headline: the climb beats (and the panel titles)
+     lead      Fraunces italic the one-line greeting above the H1, never a paragraph
+     body      Inter 400       the paragraph under a headline
+     label     Inter 500       the reference lists under a beat and the contact links
+
+   JetBrains Mono (--font-badge), the only monospace on the page, has no role here:
+   summit/summit.css sets it on the rail labels and on the panels' dates and badges.
+
+   Headlines are sentence case in the copy itself. The old all-caps serif needed tracking to
+   keep its capitals apart and still read as shouting; Bricolage carries the weight on its own,
+   and lower case is where its character is. Uppercase is left to the rail labels, where it is
+   the point: a short label, widely tracked, in the one monospace on the page.
+
+   Headlines scale with the viewport through a clamp: the H1 from 44px on a 390px phone to 64px
+   at 1440, the H2 from 28px to 40px at 1600. The H2 takes the longer run on purpose - at 1024
+   a faster one sets "I study how systems / break, so they can hold" on two lines wide enough
+   to reach the flag string the Nepal layer keeps clear of the copy (COPY_ZONES). Running text
+   moves by a pixel at most, because a paragraph does not get easier to read by growing with
+   the window. Body text is never below 16px. */
+:root {
+  --type-display: clamp(2.75rem, 2.2857rem + 1.9048vw, 4rem);
+  --type-h2: clamp(1.75rem, 1.5083rem + 0.9917vw, 2.5rem);
+  --type-lead: clamp(1.125rem, 1.0786rem + 0.1905vw, 1.25rem);
+  --type-body: clamp(1rem, 0.9768rem + 0.0952vw, 1.0625rem);
+  --type-label: clamp(0.875rem, 0.8518rem + 0.0952vw, 0.9375rem);
+}
+
+/* The static instances are cut for these sizes (96pt and 36pt optical size), so neither
+   headline needs tracking: the display cut is already set tight, the 36pt one open enough for
+   a phone. Leading leaves room for descenders now that headlines are in lower case. */
+.t-display {
+  font-family: var(--font-display);
+  font-size: var(--type-display);
+  line-height: 1.06;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.t-h2 {
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  line-height: 1.15;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.t-lead {
+  font-family: var(--font-accent);
+  font-size: var(--type-lead);
+  line-height: 1.2;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.t-label {
+  font-family: var(--font-body);
+  font-size: var(--type-label);
+  line-height: 1.4;
+  font-weight: 500;
+}
