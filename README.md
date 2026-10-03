@@ -7,7 +7,7 @@ résumé is at the top, in a rail of seven sections that open as glass panels ov
 
 ![The summit view: the Experience panel open beside the section rail, above a sea of clouds](docs/screenshot.png)
 
-**Live site:** _TODO: add the URL before publishing._
+**Live site:** [evanbhandari.com.np](https://evanbhandari.com.np)
 
 The scene is one continuous procedural world; only the camera and the atmosphere change with
 scroll. There are no model, texture, HDRI or image files: terrain, sky, clouds, grass, trees,
@@ -61,9 +61,13 @@ The dev server reads one environment variable, `PORT`, and holds it strictly (a 
 fails rather than moving). Without it Vite uses 5173 or the next free port. The site itself
 reads no environment variables.
 
+Every push to `main` runs `.github/workflows/deploy.yml`, which lints, builds and publishes
+`dist/` to GitHub Pages at the custom domain set in the repository's Pages settings.
+
 ## Project structure
 
 ```
+.github/workflows/       deploy.yml: lint, build and publish to GitHub Pages on push to main
 index.html               entry HTML: title, description, font preloads
 public/fonts/            the self-hosted webfonts and their license (OFL.txt)
 src/main.tsx             entry: pushes config colours into CSS, mounts the app
