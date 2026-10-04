@@ -47,12 +47,14 @@ const TARGETS = `
   const label = (el) => {
     if (el.closest('.summit-rail')) return 'rail';
     if (el.closest('.summit-panel')) return 'panel';
+    if (el.closest('.beat-box')) return 'box';
+    if (el.closest('.music-pill')) return 'music';
     if (el.matches('h1, h2')) return 'headline';
     if (el.classList.contains('beat-pill') || el.classList.contains('section-name')) return 'section name';
     if (el.classList.contains('nepal-sub')) return 'devanagari';
     return 'copy';
   };
-  const roots = [document.getElementById('hero'), document.querySelector('.summit-nav')].filter(Boolean);
+  const roots = [document.getElementById('hero'), document.querySelector('.summit-nav'), document.querySelector('.music-pill')].filter(Boolean);
   for (const el of roots.flatMap((root) => [...root.querySelectorAll('*')])) {
     // Only elements that paint their own text, not wrappers around other elements.
     let own = '';

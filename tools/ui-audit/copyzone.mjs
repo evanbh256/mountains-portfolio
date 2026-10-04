@@ -26,8 +26,10 @@ const BUFFER = 2.5
 const MEASURE = `
   const cfg = await import('/src/scene/config.ts');
   const W = innerWidth, H = innerHeight;
-  // The climb beats: the text block inside each beat article (not the summit chapters).
-  const blocks = [...document.querySelectorAll('#hero > div > article[aria-labelledby^="beat-"] > div')];
+  // The lower-left climb beats: the text block inside each beat article (not its glass box,
+  // and not the summit title, which sits top right).
+  const blocks = [...document.querySelectorAll('#hero > div > article[aria-labelledby^="beat-"] > div.beat-copy')]
+    .slice(0, cfg.TEXT_BEAT_COUNT);
   return blocks.map((div) => {
     let x1 = -1e9, y0 = 1e9;
     // The text itself, line by line, not the element boxes: a paragraph's box is as wide as

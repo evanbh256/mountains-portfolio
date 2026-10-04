@@ -188,10 +188,10 @@ export interface CopyZone {
  * copy's real footprint.
  */
 export const COPY_ZONES: CopyZone[] = [
-  { aspect: 4 / 3, x1: 45.4, y0: [52.3, 53.4, 61.9, 56.8] },
-  { aspect: 1132 / 764, x1: 42.4, y0: [51.4, 52.8, 61.5, 52.8] },
-  { aspect: 1.6, x1: 39, y0: [52.6, 54.3, 62.9, 54.3] },
-  { aspect: 16 / 9, x1: 37.4, y0: [50.3, 52.2, 61.2, 52.2] },
+  { aspect: 4 / 3, x1: 50.2, y0: [57.2, 59.5, 62.9, 75] },
+  { aspect: 1132 / 764, x1: 45.6, y0: [56.3, 58.9, 62.3, 74.5] },
+  { aspect: 1.6, x1: 40.6, y0: [57.3, 54.7, 63.3, 69.8] },
+  { aspect: 16 / 9, x1: 38.2, y0: [55.1, 52.5, 61.5, 68.2] },
 ]
 
 /** Samples per beat window. A tree crossing the zone does so over ~5% of t at most. */

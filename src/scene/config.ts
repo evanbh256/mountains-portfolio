@@ -18,12 +18,14 @@ export const HERO_SCREENS = 10
 export const BEAT_COUNT = 5
 
 /**
- * How many of those stops carry copy. Must equal BEATS.length in content/content.ts.
+ * How many of those stops carry copy in the lower-left copy zone, which the Nepal layer keeps
+ * its props out of (COPY_ZONES in scene/nepal/anchors.ts). These are the first beats in
+ * content/content.ts; Hero.tsx checks it.
  *
- * The last stop deliberately has none: its window (t = 0.8 to 1.0) is the approach to the
- * summit, which the brief asks to be a pure view. Keeping the stop but emptying it is what
- * lets the text end early without moving the camera, the atmosphere schedule, or a single
- * prayer flag - all of which are placed at literal t values tuned against this rhythm.
+ * The last stop's window (t = 0.8 to 1.0) is the approach to the summit. It carries only a
+ * title, set top right over the sky, so the corner the props were cleared from stays a pure
+ * view and nothing moves: not the camera, the atmosphere schedule, or a single prayer flag,
+ * all of which are placed at literal t values tuned against this rhythm.
  */
 export const TEXT_BEAT_COUNT = 4
 

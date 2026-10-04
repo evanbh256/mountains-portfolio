@@ -29,9 +29,15 @@
    blur to reduce: it is a light tint, a hairline and a bend.
 
    From 900px wide the rail and panel sit side by side on the left; below that the rail is a
-   pill bar along the bottom and the panel a sheet above it. */
+   pill bar along the bottom and the panel a sheet above it.
 
-.summit-nav {
+   The climb's boxes (.beat-box, hero/Beat.tsx) and the music pill (.music-pill,
+   ui/MusicPill.tsx) are the same glass, so they take the same tokens; their own layout is at
+   the end of this file. */
+
+.summit-nav,
+.beat-box,
+.music-pill {
   /* Surface: clear and unblurred, darkened by a fifth; the rim's bend is what makes it glass. */
   --glass-tint: rgb(0 0 0 / 0.2);
   --glass-radius-lg: 40px;
@@ -68,7 +74,9 @@
 
   --spring: cubic-bezier(0.3, 1.55, 0.6, 1);
   --settle: cubic-bezier(0.4, 0, 0.2, 1);
+}
 
+.summit-nav {
   position: fixed;
   z-index: 10;
   top: 0;
@@ -80,9 +88,24 @@
   pointer-events: none;
 }
 
-.summit-nav :focus-visible {
+.summit-nav :focus-visible,
+.beat-box :focus-visible,
+.music-pill :focus-visible {
   outline: 2px solid var(--glass-focus);
   outline-offset: 2px;
+}
+
+/* Below 900px the music pill sits across the top (it would cover the summit's rail bar at the
+   bottom), so whatever else lives up there starts this much lower: the climb boxes and the
+   summit title. */
+:root {
+  --music-clear: 0px;
+}
+
+@media (max-width: 899.98px) {
+  :root {
+    --music-clear: 4.25rem;
+  }
 }
 
 /* ---- The glass ---- */
@@ -248,6 +271,10 @@
 }
 
 .summit-panel {
+  /* Darker than the rest of the glass (0.2): Evan asked for the panels darker for
+     readability, 2026-10-03. The rail and the climb's glass keep the lighter tint. */
+  --glass-tint: rgb(0 0 0 / 0.35);
+
   display: flex;
   flex-direction: column;
   grid-area: 1 / 1;
@@ -650,6 +677,337 @@
     align-items: center;
     min-height: 44px;
     margin-top: 2px;
+  }
+}
+
+/* ---- Climb boxes (hero/Beat.tsx) ----
+
+   One small panel per beat, on the right, fading in and out with the beat's copy (the
+   ticker writes the fade on .beat-box itself). From 1024px it is centred down the right
+   edge; narrower than that the copy runs the full width along the bottom, so the box moves
+   to the top right instead. */
+
+.beat-box-slot {
+  position: absolute;
+  top: calc(max(1.25rem, env(safe-area-inset-top)) + var(--music-clear));
+  right: 1.25rem;
+  left: 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.beat-box {
+  width: min(22rem, 100%);
+}
+
+/* No close button to clear: the head pads the same on both sides. */
+.beat-box .glass-head {
+  padding-right: 38px;
+}
+
+.glass-copy {
+  font-family: var(--font-body);
+  font-size: 0.96875rem; /* 15.5px, as the panels' bullets */
+  line-height: 1.55;
+  color: var(--glass-text);
+}
+
+/* A photograph across the top, inset by the same margin all round so its corners follow the
+   glass's. */
+.beat-box-media {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 10px 10px 0;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: calc(var(--glass-radius-lg) - 10px);
+}
+
+.beat-box-media + .glass-head {
+  padding-top: 18px;
+}
+
+/* A line under the title (box 3's date) sits close under it, like a caption. The body keeps
+   its own top padding: that is where its scroll fade is. */
+.beat-box .glass-head:has(+ .glass-body) {
+  padding-bottom: 0;
+}
+
+/* Icon links: the close button's round inset, sized for a finger. */
+.beat-box-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* A box that is only its links: a slim pill round the row, sized to it. */
+.beat-box--links {
+  width: auto;
+}
+
+.beat-box--links .beat-box-links {
+  margin: 0;
+  padding: 12px;
+}
+
+.beat-box-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--glass-radius-pill);
+  color: var(--glass-text);
+  transition: background-color 0.2s var(--settle);
+}
+
+/* Hovered or focused, the mark grows and lights up in its brand's colours, with a glow of
+   the main one (--glow, set per link from icons.ts). */
+.brand-mark {
+  overflow: visible;
+  transition:
+    transform 0.32s var(--spring),
+    filter 0.25s var(--settle);
+}
+
+.brand-part,
+.brand-under {
+  transition: fill 0.25s var(--settle);
+}
+
+.brand-part {
+  fill: currentColor;
+}
+
+.brand-under {
+  fill: transparent;
+}
+
+.beat-box-link:is(:hover, :focus-visible) {
+  background-color: var(--glass-fill-hover);
+}
+
+.beat-box-link:is(:hover, :focus-visible) .brand-mark {
+  transform: scale(1.35);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--glow) 55%, transparent));
+}
+
+.beat-box-link:is(:hover, :focus-visible) :is(.brand-part, .brand-under) {
+  fill: var(--lit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat-box-link:is(:hover, :focus-visible) .brand-mark {
+    transform: none;
+  }
+}
+
+@media (max-width: 899.98px) {
+  .beat-box .glass-head {
+    padding-right: 22px;
+  }
+
+  /* Shallower, so a box with a photo still clears the copy on a short phone. */
+  .beat-box-media {
+    aspect-ratio: 2 / 1;
+  }
+
+  .beat-box-media + .glass-head {
+    padding-top: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .beat-box-slot {
+    top: 0;
+    right: 4rem;
+    bottom: 0;
+    left: auto;
+    align-items: center;
+  }
+}
+
+/* ---- Music pill (ui/MusicPill.tsx) ----
+
+   The rail's glass in a pill: play/pause, the song (a link to it on YouTube) and a volume
+   knob. Fixed bottom right from 900px; below that, across the top on the right (--music-clear
+   above moves what else is up there out of its way). */
+
+.music-pill {
+  /* Darker than the panels: the pill is on screen the whole way up, its type is small, and at
+     the summit it sits over sunlit snow (desktop) or pale sky (phones). The artist line
+     measured 2.7:1 there at 0.35, and 3.9:1 at 0.45. */
+  --glass-tint: rgb(0 0 0 / 0.5);
+
+  position: fixed;
+  z-index: 11;
+  right: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(20rem, calc(100vw - 48px));
+  padding: 5px 10px 5px 5px;
+  border-radius: var(--glass-radius-pill);
+}
+
+.music-play {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--glass-radius-pill);
+  color: var(--glass-text);
+  cursor: pointer;
+  transition: background-color 0.2s var(--settle);
+}
+
+.music-play:hover {
+  background-color: var(--glass-fill-hover);
+}
+
+/* Starting up or buffering: the icon breathes until the sound arrives. */
+.music-play[data-status='loading'] svg {
+  animation: music-wait 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes music-wait {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.music-title {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  padding-right: 2px;
+  color: var(--glass-text);
+  text-decoration: none;
+}
+
+.music-song,
+.music-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.music-song {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.4);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s var(--settle);
+}
+
+.music-title:hover .music-song {
+  text-decoration-color: currentColor;
+}
+
+.music-artist {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--glass-text); /* not muted: at 12px it needs every bit of contrast */
+}
+
+/* The knob: a ring cut from a conic gradient, filled clockwise from bottom left over 270°
+   to --level (0..1), round a cap whose tick points at the level. */
+.music-knob {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.music-knob:active {
+  cursor: grabbing;
+}
+
+.music-knob::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 225deg,
+    rgb(255 255 255 / 0.95) calc(var(--level) * 270deg),
+    rgb(255 255 255 / 0.25) 0 270deg,
+    transparent 0
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+}
+
+.music-knob-cap {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  transform: rotate(calc(-135deg + var(--level) * 270deg));
+}
+
+.music-knob-cap::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 2px;
+  height: 7px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background-color: var(--glass-text);
+}
+
+/* YouTube's player: playing, but never seen. Off to the side at the size YouTube asks for,
+   transparent, and inert (MusicPill.tsx). */
+.music-player {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 899.98px) {
+  .music-pill {
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: 1.25rem;
+    bottom: auto;
+    max-width: calc(100vw - 2.5rem);
+  }
+
+  .music-play {
+    width: 42px;
+    height: 42px;
+  }
+
+  .music-knob {
+    width: 40px;
+    height: 40px;
+  }
+
+  .music-knob-cap {
+    inset: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-play[data-status='loading'] svg {
+    animation: none;
   }
 }
 

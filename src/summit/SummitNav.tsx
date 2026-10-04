@@ -5,15 +5,9 @@ import { rig, scrollStore } from '../scroll/scrollStore'
 import { FRAME_PRIORITY, onFrame } from '../scroll/ticker'
 import { FORCE_OPAQUE_GLASS } from '../lib/env'
 import { RAIL_REVEAL } from './layout'
-import { useLiquidGlass, type LiquidGlassOptions } from './liquidGlass'
+import { PANEL_GLASS, RAIL_GLASS, useLiquidGlass } from './liquidGlass'
 import { SectionBody } from './SectionBody'
 import './summit.css'
-
-/** A panel: the rim fills the corner radius, and the scene bends a little way in across it. */
-const PANEL_GLASS: LiquidGlassOptions = { bezel: 38, depth: 40 }
-
-/** The rail: the same glass, a narrower rim for a slimmer shape. */
-const RAIL_GLASS: LiquidGlassOptions = { bezel: 22, depth: 22 }
 
 interface SummitNavProps {
   /** false = the no-WebGL fallback: no climb, the page is plain sections. */

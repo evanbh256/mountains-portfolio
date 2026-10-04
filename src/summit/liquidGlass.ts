@@ -27,6 +27,15 @@ export interface LiquidGlassOptions {
   depth: number
 }
 
+/**
+ * A panel: the rim fills the corner radius, and the scene bends a little way in across it.
+ * The summit panels and the climb's boxes (hero/Beat.tsx) both use it.
+ */
+export const PANEL_GLASS: LiquidGlassOptions = { bezel: 38, depth: 40 }
+
+/** The rail, and the music pill (ui/MusicPill.tsx): the same glass, a narrower rim for a slimmer shape. */
+export const RAIL_GLASS: LiquidGlassOptions = { bezel: 22, depth: 22 }
+
 /** The backdrop: the bend and nothing else. The glass is clear: the scene is neither blurred nor recoloured. */
 const backdropFor = (id: string) => `url(#${id})`
 

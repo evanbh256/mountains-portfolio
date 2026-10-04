@@ -1,13 +1,17 @@
 import { useLayoutEffect, useRef } from 'react'
 import { BEATS, SITE } from '../content/content'
-import { BEAT_SLIDE_PX, HERO_SCREENS, TEXT_BEAT_COUNT } from '../scene/config'
+import { BEAT_COUNT, BEAT_SLIDE_PX, HERO_SCREENS, TEXT_BEAT_COUNT } from '../scene/config'
 import { beatEnvelope, type BeatEnvelope } from '../scroll/progress'
 import { measureHero, scrollStore, useBeatIndex } from '../scroll/scrollStore'
 import { FRAME_PRIORITY, onFrame } from '../scroll/ticker'
 import { Beat } from './Beat'
 
-if (BEATS.length !== TEXT_BEAT_COUNT) {
-  throw new Error(`content.ts has ${BEATS.length} beats but TEXT_BEAT_COUNT is ${TEXT_BEAT_COUNT}`)
+if (BEATS.length !== BEAT_COUNT) {
+  throw new Error(`content.ts has ${BEATS.length} beats but BEAT_COUNT is ${BEAT_COUNT}`)
+}
+// The Nepal layer keeps its props clear of the lower-left copy for exactly these beats.
+if (BEATS.some((beat, i) => (beat.place !== 'top-right') !== i < TEXT_BEAT_COUNT)) {
+  throw new Error(`content.ts: only the first ${TEXT_BEAT_COUNT} beats (TEXT_BEAT_COUNT) may sit lower left`)
 }
 
 interface HeroProps {
@@ -26,6 +30,7 @@ export function Hero({ pinned, reducedMotion }: HeroProps) {
   const heroRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const beatRefs = useRef<(HTMLDivElement | null)[]>([])
+  const boxRefs = useRef<(HTMLElement | null)[]>([])
   const active = useBeatIndex() // re-renders only when the beat changes
 
   // Cache hero geometry; re-measure on resize (never read layout per frame).
@@ -41,35 +46,48 @@ export function Hero({ pinned, reducedMotion }: HeroProps) {
     return () => ro.disconnect()
   }, [pinned])
 
-  // Beat opacity/slide, written imperatively from the shared ticker.
+  // Beat opacity/slide, written imperatively from the shared ticker: the text block and its
+  // glass box (each on the element itself; see BeatBox) move as one.
   useLayoutEffect(() => {
     const els = beatRefs.current
+    const boxes = boxRefs.current
     if (!pinned) {
-      for (const el of els) el?.style.removeProperty('opacity')
-      for (const el of els) el?.style.removeProperty('visibility')
-      for (const el of els) el?.style.removeProperty('transform')
+      for (const el of [...els, ...boxes]) {
+        el?.style.removeProperty('opacity')
+        el?.style.removeProperty('visibility')
+        el?.style.removeProperty('transform')
+      }
       return
     }
     const lastOpacity = els.map(() => -1)
     const lastY = els.map(() => Number.NaN)
     const env: BeatEnvelope = { opacity: 0, offset: 0 }
+    const fade = (el: HTMLElement, o: number) => {
+      el.style.opacity = String(o)
+      el.style.visibility = o > 0 ? 'visible' : 'hidden'
+      el.style.pointerEvents = o > 0.5 ? 'auto' : 'none'
+    }
+    const slide = (el: HTMLElement, y: number) => {
+      el.style.transform = y === 0 ? 'none' : `translate3d(0, ${y}px, 0)`
+    }
 
     const apply = () => {
       const t = scrollStore.t
       for (let i = 0; i < els.length; i++) {
         const el = els[i]
         if (!el) continue
+        const box = boxes[i]
         beatEnvelope(t, i, env)
         const o = Math.round(env.opacity * 1000) / 1000
         const y = reducedMotion ? 0 : Math.round(env.offset * BEAT_SLIDE_PX * 10) / 10
         if (o !== lastOpacity[i]) {
-          el.style.opacity = String(o)
-          el.style.visibility = o > 0 ? 'visible' : 'hidden'
-          el.style.pointerEvents = o > 0.5 ? 'auto' : 'none'
+          fade(el, o)
+          if (box) fade(box, o)
           lastOpacity[i] = o
         }
         if (y !== lastY[i]) {
-          el.style.transform = y === 0 ? 'none' : `translate3d(0, ${y}px, 0)`
+          slide(el, y)
+          if (box) slide(box, y)
           lastY[i] = y
         }
       }
@@ -83,6 +101,9 @@ export function Hero({ pinned, reducedMotion }: HeroProps) {
       key={beat.id}
       ref={(el) => {
         beatRefs.current[i] = el
+      }}
+      boxRef={(el) => {
+        boxRefs.current[i] = el
       }}
       beat={beat}
       index={i}

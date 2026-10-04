@@ -72,9 +72,10 @@ index.html               entry HTML: title, description, font preloads
 public/fonts/            the self-hosted webfonts and their license (OFL.txt)
 src/main.tsx             entry: pushes config colours into CSS, mounts the app
 src/App.tsx              the three layers: WebGL canvas, scroller, summit rail
-src/content/             the copy: content.ts (one entry per climb beat) and resume.ts
-                         (the résumé the summit rail and panels both render)
-src/hero/                Hero (track + pinned stage), Beat
+src/content/             the copy: content.ts (one entry per climb beat, their glass boxes,
+                         the song) and resume.ts (the résumé the summit rail and panels both
+                         render); mountain.jpg, the photo in the third beat's box
+src/hero/                Hero (track + pinned stage), Beat (copy and its glass box)
 src/scroll/              ScrollRig (Lenis + the frame loop), scrollStore, progress math,
                          ticker, navigation
 src/scene/config.ts      every tunable: track length, easing, camera path, terrain,
@@ -91,7 +92,11 @@ src/scene/nepal/         the Nepal detail layer: prayer flags, chortens, the sto
 src/summit/              SummitNav (rail, panels, hash, focus), SectionBody (a section's
                          layout), liquidGlass (the refraction filter), summit.css, layout
                          (the summit frame's zones and the rail's reveal window)
-src/ui/                  DebugHud, NepalHudSection (the HUD's Nepal switches), NepalAccents
+src/ui/                  MusicPill (the song: starts on its own, or on the first click, tap or
+                         key where the browser blocks sound until then; play/pause, title,
+                         volume knob), youtube (loads YouTube's player once the page is idle),
+                         icons (sourced path data), DebugHud, NepalHudSection (the HUD's Nepal
+                         switches), NepalAccents
 src/lib/                 quality (one tier for the scene), perfGuard (frame-time watchdog),
                          env (URL flags, device and motion detection), debug, math
 src/world/scale.ts       one unit (STEP) and every prop's size as a ratio of it
@@ -321,6 +326,18 @@ added, so the licenses below are not verified.
 
 - The close icon in `src/summit/SummitNav.tsx` has the same path as the `x` icon from
   [Lucide](https://lucide.dev) (ISC License).
+
+**Icons.** In `src/ui/icons.ts`, copied from the packages on jsDelivr on 2026-10-03.
+
+- The YouTube, Spotify and Letterboxd marks are from [Simple Icons](https://simpleicons.org)
+  16.33.0 (CC0 1.0). The marks themselves are trademarks of their owners. On hover they take
+  each brand's own colours; Letterboxd's dot colours and overlap shade are read from its
+  official decal at [letterboxd.com/about/brand](https://letterboxd.com/about/brand/).
+- The play and pause icons are `player-play` and `player-pause` (filled) from
+  [Tabler Icons](https://tabler.io/icons) 3.48.0 (MIT License).
+
+**Music.** "Mountain High" by Bipul Chettri plays from its official YouTube video through
+YouTube's embedded player; nothing of it is copied into this repository.
 - The simplex noise in `src/scene/noise.ts` follows Stefan Gustavson's reference
   implementation.
 - The `mulberry32` random number generator in `src/scene/noise.ts` is Tommy Ettinger's.
@@ -331,8 +348,8 @@ from npm and not copied into this repository.
 ## License
 
 - **Code:** MIT. See [LICENSE](LICENSE).
-- **Content:** the résumé and copy in `src/content/`, the same wording where it repeats (the
-  page title and description in `index.html`, this README's introduction), and
+- **Content:** the résumé, copy and photograph in `src/content/`, the same wording where it
+  repeats (the page title and description in `index.html`, this README's introduction), and
   `docs/screenshot.png` are © 2026 Evan Bhandari, all rights reserved. They are not covered
   by the MIT License.
 - **Fonts:** SIL Open Font License 1.1. See [public/fonts/OFL.txt](public/fonts/OFL.txt).

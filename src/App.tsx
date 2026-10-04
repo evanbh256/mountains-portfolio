@@ -6,6 +6,7 @@ import { SceneBoundary } from './scene/SceneBoundary'
 import { ScrollRig } from './scroll/ScrollRig'
 import { SummitNav } from './summit/SummitNav'
 import { DebugHud } from './ui/DebugHud'
+import { MusicPill } from './ui/MusicPill'
 import { NepalAccents } from './ui/NepalAccents'
 
 // three.js and R3F live in their own chunk, so the text and scroll rig are live first.
@@ -47,6 +48,7 @@ export default function App() {
 
       {/* Layer 2: fixed above the scroller, so a panel opening never scrolls anything. */}
       <SummitNav pinned={webgl} reducedMotion={reducedMotion} />
+      <MusicPill />
 
       <DebugHud />
     </Profiler>

@@ -295,9 +295,11 @@
   }
 }
 
-/* The Hello copy's entrance on page load (the scroll fades are written by the ticker). */
+/* The Hello copy's entrance on page load (the scroll fades are written by the ticker).
+   Backwards, not both: once it ends the animation lets go of the element, so nothing is left
+   holding opacity on an ancestor of the beat's glass box (which would cut off its bend). */
 .copy-enter {
-  animation: copy-enter 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s both;
+  animation: copy-enter 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s backwards;
 }
 
 @keyframes copy-enter {
