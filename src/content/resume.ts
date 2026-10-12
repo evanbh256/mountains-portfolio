@@ -75,7 +75,7 @@ export const RESUME_UI = {
   close: 'Close',
 } as const
 
-const EMAIL = 'contact@evanbhandari.com.np'
+const EMAIL = 'evan.bhandari06@gmail.com'
 
 export const RESUME: ResumeSection[] = [
   {
