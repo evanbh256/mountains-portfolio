@@ -119,13 +119,3 @@ export const BEATS: BeatContent[] = [
     place: 'top-right',
   },
 ]
-
-/** The song in the music pill (ui/MusicPill.tsx). Its audio plays through YouTube's player. */
-export const MUSIC = {
-  title: 'mountain high',
-  artist: 'bipul chettri',
-  videoId: 'XBGAtvldjqM',
-  href: 'https://www.youtube.com/watch?v=XBGAtvldjqM',
-  /** 0 to 100, before the visitor touches the knob. */
-  volume: 50,
-} as const

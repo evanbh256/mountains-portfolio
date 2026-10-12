@@ -133,8 +133,7 @@ export function Beat({ beat, index, active, stacked, ref, boxRef }: BeatProps) {
         className={[
           'beat-copy relative isolate w-full px-5 md:w-fit',
           topRight
-            ? // --music-clear: below 900px the music pill (summit.css) is up here too.
-              'pt-[calc(max(2.5rem,env(safe-area-inset-top))_+_var(--music-clear))] text-right md:pt-[calc(4rem_+_var(--music-clear))] md:pr-16 md:pl-10'
+            ? 'pt-[max(2.5rem,env(safe-area-inset-top))] text-right md:pt-16 md:pr-16 md:pl-10'
             : 'pb-[max(2.5rem,env(safe-area-inset-bottom))] md:max-w-[33rem] md:pr-10 md:pb-16 md:pl-16',
           active && stacked ? 'pointer-events-auto' : '',
           light ? 'copy-light text-white' : split ? 'copy-split' : 'copy-dark text-ink',

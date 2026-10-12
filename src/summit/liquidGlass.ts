@@ -33,7 +33,7 @@ export interface LiquidGlassOptions {
  */
 export const PANEL_GLASS: LiquidGlassOptions = { bezel: 38, depth: 40 }
 
-/** The rail, and the music pill (ui/MusicPill.tsx): the same glass, a narrower rim for a slimmer shape. */
+/** The rail: the glass with a narrower rim for a slimmer shape. */
 export const RAIL_GLASS: LiquidGlassOptions = { bezel: 22, depth: 22 }
 
 /** The backdrop: the bend and nothing else. The glass is clear: the scene is neither blurred nor recoloured. */
