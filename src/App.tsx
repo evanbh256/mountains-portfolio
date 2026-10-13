@@ -4,6 +4,7 @@ import { debugCounters } from './lib/debug'
 import { useReducedMotion, webglAvailable } from './lib/env'
 import { SceneBoundary } from './scene/SceneBoundary'
 import { ScrollRig } from './scroll/ScrollRig'
+import { ResumePill } from './ui/ResumePill'
 import { SummitNav } from './summit/SummitNav'
 import { DebugHud } from './ui/DebugHud'
 import { NepalAccents } from './ui/NepalAccents'
@@ -47,6 +48,8 @@ export default function App() {
 
       {/* Layer 2: fixed above the scroller, so a panel opening never scrolls anything. */}
       <SummitNav pinned={webgl} reducedMotion={reducedMotion} />
+
+      <ResumePill />
 
       <DebugHud />
     </Profiler>

@@ -35,7 +35,8 @@
    the end of this file. */
 
 .summit-nav,
-.beat-box {
+.beat-box,
+.resume-pill {
   /* Surface: clear and unblurred, darkened by a fifth; the rim's bend is what makes it glass. */
   --glass-tint: rgb(0 0 0 / 0.2);
   --glass-radius-lg: 40px;
@@ -87,7 +88,8 @@
 }
 
 .summit-nav :focus-visible,
-.beat-box :focus-visible {
+.beat-box :focus-visible,
+.resume-pill:focus-visible {
   outline: 2px solid var(--glass-focus);
   outline-offset: 2px;
 }
@@ -839,4 +841,54 @@
 /* ?glass=opaque: near-opaque smoke. */
 .summit-nav[data-glass='opaque'] .glass {
   background-color: rgb(14 18 28 / 0.96);
+}
+
+/* ---- Resume pill (ui/ResumePill.tsx) ----
+
+   The rail's glass in a pill, fixed bottom right. Darker than the panels for the same reason
+   the old music pill was: it is on screen the whole way up, over snow and pale sky at the top. */
+
+.resume-pill {
+  --glass-tint: rgb(0 0 0 / 0.5);
+
+  position: fixed;
+  z-index: 11;
+  right: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 24px 7px 7px;
+  border-radius: var(--glass-radius-pill);
+  color: var(--glass-text);
+  text-decoration: none;
+}
+
+.resume-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: var(--glass-radius-pill);
+  transition: background-color 0.2s var(--settle);
+}
+
+.resume-pill:hover .resume-icon {
+  background-color: var(--glass-fill-hover);
+}
+
+.resume-label {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Below 900px the summit's rail bar runs along the bottom, so the pill sits across the top. */
+@media (max-width: 899.98px) {
+  .resume-pill {
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: 1.25rem;
+    bottom: auto;
+  }
 }

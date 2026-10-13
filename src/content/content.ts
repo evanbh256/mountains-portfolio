@@ -119,3 +119,9 @@ export const BEATS: BeatContent[] = [
     place: 'top-right',
   },
 ]
+
+/** The resume pill (ui/ResumePill.tsx): the resume PDF's Drive share link. */
+export const RESUME_LINK = {
+  label: 'resume',
+  href: 'https://drive.google.com/file/d/10Tkg9nd28TmPDkizbWxdcJFlK6a4TkAG/view?usp=sharing',
+} as const
