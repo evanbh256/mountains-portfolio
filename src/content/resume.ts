@@ -91,9 +91,27 @@ export const RESUME: ResumeSection[] = [
         when: 'Sept 2026 – Present',
         where: 'Madison, SD',
         bullets: [
-          "Monitor and analyze Tier 1 security events using Microsoft Defender and Entra ID within DSU's Cyber Security Operations Center, investigating potential threats and executing incident response actions such as revoking compromised sessions and locking down access.",
-          'Conduct proactive threat hunts using KQL queries in Microsoft Defender Advanced Hunting, reviewing historical security events to identify attack patterns and indicators missed by automated alerting.',
+          "Monitor and analyze Tier 1 security events using Microsoft Defender, Entra ID, PhishER within DSU's Cyber Security Operations Center, investigating potential threats and executing incident response actions such as revoking compromised sessions and locking down access, while flagging recurring attack patterns that need new detection coverage.",
+          'Conduct proactive threat hunts and perform detection engineering using KQL in Microsoft Defender Advanced Hunting, reviewing historical security events to find attack patterns missed by automated alerting, then converting a high-frequency, repeating attack vector into a Defender custom detection rule that alerts automatically.',
           "Collaborate within an Agile-aligned SOC team through daily stand-ups, documenting investigation findings and escalating confirmed incidents to senior analysts, experience directly informing how attacker activity looks from the defender's side.",
+        ],
+      },
+      {
+        title: 'Residence Life, Dakota State University',
+        role: 'Resident Assistant',
+        when: 'Aug 2025 – Sept 2026',
+        where: 'Madison, SD',
+        bullets: [
+          'Delivered 24/7 emergency response and safety monitoring for a residential floor of 40+ students, applying structured conflict resolution and policy enforcement while maintaining clear, professional communication with residents and university staff.',
+        ],
+      },
+      {
+        title: 'Madison Community Center',
+        role: 'Service Desk Assistant',
+        when: 'May 2026 – July 2026',
+        where: 'Madison, SD',
+        bullets: [
+          'Directed front-desk operations as the primary point of contact for 100+ daily visitors, executing membership processing, access control check-ins, and facility security protocols.',
         ],
       },
       {
@@ -114,11 +132,19 @@ export const RESUME: ResumeSection[] = [
     kind: 'entries',
     entries: [
       {
+        title: 'Mirage',
+        role: 'HackHarvard 2026 (Best Use of Daytona)',
+        link: { label: 'github.com/evanbh256/Mirage', href: 'https://github.com/evanbh256/Mirage' },
+        bullets: [
+          'AI-agent containment and deception system that intercepts every tool call an autonomous agent makes, scores it with a two-layer watcher (deterministic scope rules plus an LLM second opinion), and redirects out-of-scope actions into a decoy environment while a human defender is alerted.',
+        ],
+      },
+      {
         title: 'Terminal Quest',
         role: 'Ignite Hackathon',
-        link: { label: 'github.com/evanbh256/terminal-quest', href: 'https://github.com/evanbh256/terminal-quest' },
+        link: { label: 'github.com/evanbh256/terminalquest', href: 'https://github.com/evanbh256/terminalquest' },
         bullets: [
-          'Independently continued development into a full-stack browser-based dungeon RPG that transforms the filesystem into the game world, using native Linux commands (ls, cd, mv, find) to drive movement, item discovery, and room transitions.',
+          'Browser-based Linux learning game where rooms act as directories and files as items, teaching beginners ls, cd, find, mv, and rm; includes Supabase authentication, saved progress, and Gemini-powered hints routed through server-side Edge Functions so API keys never reach the browser.',
         ],
       },
       {
@@ -186,7 +212,7 @@ export const RESUME: ResumeSection[] = [
       degree: 'B.S. Cyber Operations, Minor in Network Security Administration',
       when: 'Aug 2024 – Dec 2027',
       gpa: 'GPA: 3.8',
-      honors: ['Honors Program', "President's Academic Honors List", 'DSU Rising & Champion Scholarship'],
+      honors: ['Honors Program', 'International Club President', "President's Academic Honors List", 'DSU Rising & Champion Scholarship'],
     },
   },
   {
@@ -202,11 +228,15 @@ export const RESUME: ResumeSection[] = [
           'Microsoft Defender',
           'Microsoft Defender Advanced Hunting',
           'Entra ID',
+          'KQL',
+          'Detection Engineering',
           'Threat Hunting',
           'Incident Response',
           'SOC Alert Triage',
           'Active Directory Hardening',
           'Email & Phishing Security',
+          'AI/LLM Security',
+          'Anthropic / OpenAI APIs',
         ],
       },
       { label: 'Operating Systems', items: ['Linux', 'Windows Server', 'macOS'] },
